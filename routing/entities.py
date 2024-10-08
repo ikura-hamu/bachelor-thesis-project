@@ -266,14 +266,14 @@ class Gap:
         assign_nets.extend([net])
 
         new_assignment = []
-        last_max_h = self.max_height_range(assign_nets[0].minx, assign_nets[0].maxx)
-        for n in assign_nets:
-            updated_max_h = self.update_max_height(last_max_h, n)
-            assignment = Assignment(n, updated_max_h)
-            # register assignment
-            self.net2assignment[net.name] = assignment
-            new_assignment.append(assignment)
-            last_max_h = updated_max_h
+        last_max_h = self.max_height_range(net.minx, net.maxx)
+        updated_max_h = self.update_max_height(last_max_h, net)
+
+        assignment = Assignment(net, updated_max_h)
+        # register assignment
+        self.net2assignment[net.name] = assignment
+        new_assignment.append(assignment)
+        last_max_h = updated_max_h
 
         # new assignment does not surpass the max channel hegiht
         for x in self.range_x(net.minx, net.maxx):
