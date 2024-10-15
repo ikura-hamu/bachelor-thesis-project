@@ -1,4 +1,5 @@
 import math
+import time
 import argparse
 from decimal import Decimal
 from numpy.random import default_rng
@@ -8,14 +9,16 @@ from src import algos, vis
 
 def get_args():
     parser = argparse.ArgumentParser(description="")
-    parser.add_argument("--seed", "-s", type=int, default=0, help="random seed")
+    parser.add_argument("--seed", "-s", type=int,
+                        default=0, help="random seed")
     parser.add_argument(
         "--n_nets", "-n", type=int, default=100, help="the number of nets"
     )
     parser.add_argument(
         "--scenario", "-c", type=int, default=1, choices=[1, 2], help="scenario"
     )
-    parser.add_argument("--gap_width", "-w", type=float, default=None, help="gap width")
+    parser.add_argument("--gap_width", "-w", type=float,
+                        default=None, help="gap width")
     parser.add_argument(
         "--gap_interval", "-i", type=float, default=10, help="gap interval"
     )
@@ -70,9 +73,17 @@ def generate_netlist(args) -> list:
 def main():
     args = get_args()
     netlist = generate_netlist(args)
+
+    le_start = time.perf_counter()
     le_gaps = algos.left_edge(netlist, args)
+    le_end = time.perf_counter()
+    print(f"Left Edge: {(le_end - le_start)/60:.4f} sec")
+
     # 以下の関数を改良しよう
+    pro_start = time.perf_counter()
     proposal_gaps = algos.proposed_algorithm(netlist, args)
+    pro_end = time.perf_counter()
+    print(f"Proposal: {(pro_end - pro_start)/60:.4f} sec")
 
     # 結果比較
     print("Input")
