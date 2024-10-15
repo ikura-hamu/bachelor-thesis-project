@@ -4,6 +4,8 @@ from functools import cached_property
 from collections import defaultdict, UserList
 import bisect
 
+from .seg_tree import SegTree
+
 
 @dataclass(frozen=True, order=True)
 class Pin:
@@ -210,19 +212,21 @@ class Gap:
         self.id = id
         # if None, unlimited
         self.width = width
-        if not width is None:
+        if width is not None:
             self.width = Decimal(str(width))
-        if not base_height is None:
+        if base_height is not None:
             self.base_height = Decimal(str(base_height))
 
-        self.x_coords = sorted(set([x for n in netlist for x in n.x]))
+        self.x_coords: list[float] = sorted(
+            set([x for n in netlist for x in n.x]))
         self.assignments = dict([(x, []) for x in self.x_coords])
         self.net2assignment = {}
 
+        self._height = SegTree(
+            [0] * (len(self.x_coords)+2), max, 0, [float("-inf"), *self.x_coords, float("inf")])
+
     def max_height(self, x: Decimal) -> Decimal:
-        if self.assignments[x] == []:
-            return Decimal("0.0")
-        return self.assignments[x][-1].max_height
+        return self._height[x]
 
     def update_max_height(self, height: Decimal, net: Net) -> Decimal:
         updated_height = height + net.width
@@ -239,12 +243,7 @@ class Gap:
         if maxx is None:
             maxx = float("inf")
 
-        max_h = Decimal("0.0")
-        for x in self.range_x(minx, maxx):
-            h = self.max_height(x)
-            if h > max_h:
-                max_h = h
-        return max_h
+        return self._height.query_close(minx, maxx)
 
     def is_assignable(self, net: Net, height_limit: Decimal = None) -> bool:
         if height_limit is None:
@@ -278,6 +277,7 @@ class Gap:
         # new assignment does not surpass the max channel hegiht
         for x in self.range_x(net.minx, net.maxx):
             self.assignments[x].extend(new_assignment)
+            self._height.update(x, updated_max_h)
 
     def __str__(self):
         return f"{self.id} width: {self.width}, {self.net2assignment}"
