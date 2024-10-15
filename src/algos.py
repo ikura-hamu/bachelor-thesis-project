@@ -74,25 +74,49 @@ def proposed_algorithm(netlist: entities.NetList, args) -> list[entities.Gap]:
         gaps.append(gap)
         i += 1
 
-        while True:
+        # Trueのとき: 基準線より右から始まり、最大高さが変わらないときだけ配線する
+        # Falseのとき: 基準線より右から始まるのであれば, 高さが変わっても配線する
+        restrict = True
+        while sorted_netlist:
             # 基準線は最初左に無限大の位置から
             x = Decimal(float("-inf"))
             remove_nets = []
+
             for n in sorted_netlist:
                 # ポイント2:
                 # 左から右に単純に配線するだけでいい？
                 # 他になにか入力の特徴は使えないか？
-                if x < n.minx and gap.is_assignable(n):
+
+                remain_assignable = False  # まだ配線できるネットがあるか
+                if not gap.is_assignable(n):
+                    continue
+                remain_assignable = True
+
+                # 置きたいネットの範囲の最大高さ
+                range_h = gap.max_height_range(n.minx, n.maxx)
+
+                # 既に配線されているネットの最大高さ
+                all_h = gap.max_height_range()
+
+                # 今考えているネットを置いたら高さが変わるかどうか
+                height_change = gap.update_max_height(range_h, n) > all_h
+
+                if x < n.minx and (not height_change or not restrict):
                     gap.assign(n)
                     # 配線したネットの右端に基準線を移動
                     x = n.maxx
                     remove_nets.append(n)
-
-            # 配線できるネットがなかったので, 次の配線領域へ
-            if remove_nets == []:
-                break
+                    restrict = True
 
             # 配線したnetは全て削除
             for n in remove_nets:
                 sorted_netlist.remove(n)
+
+            # 配線できるネットがなかったので, 次の配線領域へ
+            if remove_nets == []:
+                if remain_assignable:
+                    restrict = False
+                    continue
+                break
+
     return gaps
