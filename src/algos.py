@@ -55,8 +55,11 @@ def proposed_algorithm(netlist: entities.NetList, args) -> list[entities.Gap]:
     # gap = 配線領域
     gaps = []
 
+    def sort_key(x: entities.Net):
+        return (-x.width, x.minx + x.maxx)
+
     # ポイント1: 何を基準に優先して検討する？
-    sorted_netlist = sorted(netlist, key=lambda x: x)
+    sorted_netlist: list[entities.Net] = sorted(netlist, key=sort_key)
 
     # 未配線ネットがなくなるまで繰り返す
     i = 0

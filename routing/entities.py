@@ -196,7 +196,7 @@ class Assignment:
     max_height: Decimal
 
     def __repr__(self) -> str:
-        return f"{self.net.name}[{self.max_height-self.net.width}, {self.max_height}]"
+        return f"{self.net.name}[{self.max_height-self.net.width}, {self.max_height}][{self.net.minx}, {self.net.maxx}]"
 
 
 class Gap:
@@ -278,3 +278,6 @@ class Gap:
         # new assignment does not surpass the max channel hegiht
         for x in self.range_x(net.minx, net.maxx):
             self.assignments[x].extend(new_assignment)
+
+    def __str__(self):
+        return f"{self.id} width: {self.width}, {self.net2assignment}"
