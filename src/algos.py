@@ -56,7 +56,7 @@ def proposed_algorithm(netlist: entities.NetList, args) -> list[entities.Gap]:
     gaps = []
 
     def sort_key(x: entities.Net):
-        return (-x.width, x.minx + x.maxx)
+        return (-x.width, x.minx, x.horizontal_wirelength)
 
     # ポイント1: 何を基準に優先して検討する？
     sorted_netlist: list[entities.Net] = sorted(netlist, key=sort_key)
