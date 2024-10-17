@@ -47,7 +47,7 @@ def proposed_algorithm(netlist: entities.NetList, args) -> list[entities.Gap]:
 
     Args:
         netlist (entities.Netlist): 入力ネット集合
-        args (list[entiites.Gap]): 配線領域幅等の情報がある
+        args: 配線領域幅等の情報がある
 
     Returns:
         list[entities.Gap]: 配線された配線領域リスト
