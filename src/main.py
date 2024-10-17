@@ -77,13 +77,13 @@ def main():
     le_start = time.perf_counter()
     le_gaps = algos.left_edge(netlist, args)
     le_end = time.perf_counter()
-    print(f"Left Edge: {(le_end - le_start)/60:.4f} sec")
+    print(f"Left Edge: {(le_end - le_start):.4f} sec")
 
     # 以下の関数を改良しよう
     pro_start = time.perf_counter()
     proposal_gaps = algos.proposed_algorithm(netlist, args)
     pro_end = time.perf_counter()
-    print(f"Proposal: {(pro_end - pro_start)/60:.4f} sec")
+    print(f"Proposal: {(pro_end - pro_start):.4f} sec")
 
     # 結果比較
     print("Input")
@@ -107,7 +107,6 @@ def main():
         print(f"Left Edge: {len(le_gaps):3}")
         print(f"Proposal: {len(proposal_gaps):3}")
         vis.plot_multiple_gaps(le_gaps, proposal_gaps)
-
 
 if __name__ == "__main__":
     main()
